@@ -47,6 +47,6 @@ jobs:
           files: |
             installer_output/start_linux.sh
             installer_output/start_osx.sh
-            installer_output/start.ps1
+            installer_output/start_windows.ps1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
