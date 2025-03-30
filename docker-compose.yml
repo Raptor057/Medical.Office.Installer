@@ -11,11 +11,6 @@ services:
     volumes:
       - medical_office_sql_data:/var/opt/mssql
     restart: always
-    healthcheck:
-      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   seq:
     image: datalust/seq:latest
@@ -37,10 +32,9 @@ services:
       - "8080:8080"
       - "8081:8081"
     depends_on:
-      sql1:
-        condition: service_healthy
-      seq:
-        condition: service_started
+      - sql1
+      - seq
+    command: /bin/sh -c "sleep 30 && dotnet Medical.Office.Api.dll"
     restart: always
 
   frontend:
