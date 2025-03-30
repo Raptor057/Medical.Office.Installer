@@ -1,0 +1,114 @@
+# # 4.0
+# version: '3.0'
+# services:
+
+#   sql1:
+#     container_name: medicalofficesql
+#     image: mcr.microsoft.com/mssql/server:latest
+#     environment:
+#       - ACCEPT_EULA=Y
+#       - SA_PASSWORD=Cbmwjmkq23
+#     ports:
+#       - "1433:1433"
+#     volumes:
+#       - medical_office_sql_data:/var/opt/mssql
+#     restart: always
+
+#   seq:
+#     image: datalust/seq:latest
+#     container_name: MedicalOfficeSeq
+#     environment:
+#       - ACCEPT_EULA=Y
+#     ports:
+#       - "5341:80"
+#     depends_on:
+#       - sql1
+#     restart: always
+
+#   medicalofficeapi:
+#     build:
+#       context: .
+#       dockerfile: './Dockerfile'
+#     container_name: medicalofficewebapi
+#     environment:
+#       - ASPNETCORE_ENVIRONMENT=Production
+#     ports:
+#       - "8080:8080"
+#       - "8081:8081"
+#     depends_on:
+#       - sql1
+#       - seq
+#     restart: always
+
+#   frontend:
+#     build:
+#       context: '../Medical.Office.ReactWebClient/'
+#       dockerfile: Dockerfile
+#       args:
+#         #- NEXT_PUBLIC_API_URL=http://77.37.74.202:8080
+#         - NEXT_PUBLIC_API_URL=http://localhost:8080
+#     container_name: medicalofficewebclient
+#     environment:
+#       #- NEXT_PUBLIC_API_URL=http://77.37.74.202:8080
+#       - NEXT_PUBLIC_API_URL=http://localhost:8080
+#     ports:
+#       - "3000:80"
+#     depends_on:
+#       - medicalofficeapi
+#     restart: always
+
+# volumes:
+#   medical_office_sql_data:
+
+version: '3.9'
+services:
+
+  sql1:
+    container_name: medicalofficesql
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Cbmwjmkq23
+    ports:
+      - "1433:1433"
+    volumes:
+      - medical_office_sql_data:/var/opt/mssql
+    restart: always
+
+  seq:
+    image: datalust/seq:latest
+    container_name: MedicalOfficeSeq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"
+    depends_on:
+      - sql1
+    restart: always
+
+  medicalofficeapi:
+    image: ghcr.io/raptor057/medicalofficewebapi:main
+    container_name: medicalofficewebapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - sql1
+      - seq
+    restart: always
+
+  frontend:
+    image: ghcr.io/raptor057/medicalofficewebclient:main
+    container_name: medicalofficewebclient
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    ports:
+      - "3000:80"
+    depends_on:
+      - medicalofficeapi
+    restart: always
+
+volumes:
+  medical_office_sql_data:
