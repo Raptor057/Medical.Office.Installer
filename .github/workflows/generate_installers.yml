@@ -1,11 +1,65 @@
-name: Generate Installer Scripts
+# name: Generate Installer Scripts
+
+# on:
+#   push:
+#     paths:
+#       - '**.in'
+#       - 'CMakeLists.txt'
+#       - '.env'
+#       - 'scripts/**'
+#       - 'scripts/generate_installers.sh'
+#   workflow_dispatch:
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v3
+
+#       - name: Create .env file
+#         run: |
+#           echo "GHCR_USERNAME=raptor057" >> .env
+#           echo "GHCR_PAT=${{ secrets.GHCR_PAT }}" >> .env
+#           echo "SA_PASSWORD=${{ secrets.SA_PASSWORD }}" >> .env
+#           echo "ASPNETCORE_ENVIRONMENT=Production" >> .env
+#           echo "NEXT_PUBLIC_API_URL=http://localhost:8080" >> .env
+
+#       - name: Install CMake
+#         run: sudo apt-get update && sudo apt-get install -y cmake
+
+#       - name: Generate installer scripts
+#         run: bash scripts/generate_installers.sh
+
+#       - name: Upload installer scripts as artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: installer-scripts
+#           path: installer_output/
+
+#       - name: Create GitHub Release
+#         uses: softprops/action-gh-release@v2
+#         with:
+#           tag_name: "v1.0.${{ github.run_number }}"
+#           name: "Medical Office Installer v1.0.${{ github.run_number }}"
+#           body: "Scripts generados automáticamente por GitHub Actions"
+#           files: |
+#             installer_output/start_linux.sh
+#             installer_output/start_osx.sh
+#             installer_output/start_windows.ps1
+#             installer_output/MedicalOfficeLauncher.command
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+name: Automatic Generate Installers
 
 on:
   push:
     paths:
       - '**.in'
       - 'CMakeLists.txt'
-      - '.env'
+      - '.env.gpg'
       - 'scripts/**'
       - 'scripts/generate_installers.sh'
   workflow_dispatch:
@@ -18,24 +72,24 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Create .env file
+      - name: Install GPG and CMake
         run: |
-          echo "GHCR_USERNAME=raptor057" >> .env
-          echo "GHCR_PAT=${{ secrets.GHCR_PAT }}" >> .env
-          echo "SA_PASSWORD=${{ secrets.SA_PASSWORD }}" >> .env
-          echo "ASPNETCORE_ENVIRONMENT=Production" >> .env
-          echo "NEXT_PUBLIC_API_URL=http://localhost:8080" >> .env
+          sudo apt-get update
+          sudo apt-get install -y gnupg cmake
 
-      - name: Install CMake
-        run: sudo apt-get update && sudo apt-get install -y cmake
+      - name: Decrypt .env.gpg
+        run: |
+          echo "${{ secrets.MY_ENV_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --output .env --decrypt .env.gpg
 
-      - name: Generate installer scripts
+      - name: Generate installers
         run: bash scripts/generate_installers.sh
+        env:
+          MY_ENV_PASSPHRASE: ${{ secrets.MY_ENV_PASSPHRASE }}
 
-      - name: Upload installer scripts as artifact
+      - name: Upload installers
         uses: actions/upload-artifact@v4
         with:
-          name: installer-scripts
+          name: installers
           path: installer_output/
 
       - name: Create GitHub Release
@@ -43,11 +97,10 @@ jobs:
         with:
           tag_name: "v1.0.${{ github.run_number }}"
           name: "Medical Office Installer v1.0.${{ github.run_number }}"
-          body: "Scripts generados automáticamente por GitHub Actions"
+          body: "Instaladores generados automáticamente desde GitHub Actions"
           files: |
             installer_output/start_linux.sh
             installer_output/start_osx.sh
             installer_output/start_windows.ps1
-            installer_output/MedicalOfficeLauncher.command
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

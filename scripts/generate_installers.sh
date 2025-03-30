@@ -4,6 +4,15 @@ set -e
 OUTPUT_DIR=installer_output
 mkdir -p $OUTPUT_DIR
 
+# 🔐 Desencriptar el archivo .env.gpg si existe
+if [[ -f .env.gpg ]]; then
+  echo "🔐 Detectado archivo .env.gpg, desencriptando..."
+  gpg --quiet --batch --yes --decrypt --passphrase="$MY_ENV_PASSPHRASE" \
+    --output .env .env.gpg || { echo "❌ Error al desencriptar .env.gpg"; exit 1; }
+else
+  echo "⚠️ Archivo .env.gpg no encontrado, usando .env existente (si hay)"
+fi
+
 echo "⚙️ Ejecutando CMake para generar los scripts de inicio..."
 cmake -S . -B build
 
@@ -18,9 +27,9 @@ chmod +x $OUTPUT_DIR/start_linux.sh $OUTPUT_DIR/start_osx.sh 2>/dev/null || echo
 echo "✅ Instaladores generados en: $OUTPUT_DIR"
 ls -l $OUTPUT_DIR
 
-cp build/MedicalOfficeLauncher.command installer_output/MedicalOfficeLauncher.command
-chmod +x installer_output/MedicalOfficeLauncher.command
+cp build/MedicalOfficeLauncher.command $OUTPUT_DIR/MedicalOfficeLauncher.command
+chmod +x $OUTPUT_DIR/MedicalOfficeLauncher.command
 
-cp docker-compose.yml installer_output/docker-compose.yml
-cp -r scripts installer_output/scripts
-cp .env installer_output/
+cp docker-compose.yml $OUTPUT_DIR/docker-compose.yml
+cp -r scripts $OUTPUT_DIR/scripts
+cp .env $OUTPUT_DIR/
