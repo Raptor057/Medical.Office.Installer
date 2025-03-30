@@ -17,7 +17,7 @@ jobs:
 
       - name: Install GPG
         run: |
-          Invoke-WebRequest -Uri 'https://files.gpg4win.org/gpg4win-light-4.3.0.exe' -OutFile 'gpg-installer.exe'
+          Invoke-WebRequest -Uri 'https://files.gpg4win.org/gpg4win-light-2.3.4.exe' -OutFile 'gpg-installer.exe'
           Start-Process -FilePath 'gpg-installer.exe' -ArgumentList '/SILENT' -Wait
 
 
