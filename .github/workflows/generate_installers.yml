@@ -3,14 +3,14 @@
 name: Automatic Generate Installers
 
 on:
-  push:
-    paths:
-      - '**.in'
-      - 'CMakeLists.txt'
-      - '.env'
-      - 'scripts/**'
-      - 'generate_installers.sh'
-
+    push:
+      paths:
+        - '**.in'
+        - 'CMakeLists.txt'
+        - '.env'
+        - 'scripts/**'
+        - 'generate_installers.sh'
+    workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
