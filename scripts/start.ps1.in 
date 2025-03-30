@@ -9,5 +9,11 @@ powershell -ExecutionPolicy Bypass -File "scripts\check_docker_windows.ps1"
 # Login a GHCR
 $env:GHCR_PAT | docker login ghcr.io -u $env:GHCR_USERNAME --password-stdin
 
-# Levantar contenedores
+Write-Host "🔍 Verificando actualizaciones de imágenes..."
+docker-compose pull
+
+Write-Host "⏬ Apagando contenedores anteriores (si existen)..."
+docker-compose down
+
+Write-Host "🚀 Iniciando contenedores..."
 docker-compose up -d

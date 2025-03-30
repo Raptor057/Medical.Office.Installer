@@ -15,5 +15,11 @@ fi
 # Login a GHCR
 echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
-# Levantar contenedores
+echo "🔍 Verificando actualizaciones de imágenes..."
+docker-compose pull
+
+echo "⏬ Apagando contenedores anteriores (si existen)..."
+docker-compose down
+
+echo "🚀 Iniciando contenedores..."
 docker-compose up -d
