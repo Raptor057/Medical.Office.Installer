@@ -1,26 +1,47 @@
-# scripts/start.sh.in
 #!/bin/bash
-
 set -e
 
-export GHCR_USERNAME="@GHCR_USERNAME@"
-export GHCR_PAT="@GHCR_PAT@"
+# Obtener el path del script
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Detectar sistema operativo y verificar Docker
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  bash scripts/check_docker_macos.sh
+# 🔐 Cargar variables desde .env o .env.gpg
+if [[ -f "$PROJECT_ROOT/.env" ]]; then
+  echo "🔐 Cargando variables desde .env"
+  set -a
+  source "$PROJECT_ROOT/.env"
+  set +a
+elif [[ -f "$PROJECT_ROOT/.env.gpg" ]]; then
+  echo "🔐 Desencriptando .env.gpg..."
+  gpg --quiet --batch --yes --decrypt \
+      --passphrase="$MY_ENV_PASSPHRASE" \
+      --output "$PROJECT_ROOT/.env" "$PROJECT_ROOT/.env.gpg"
+
+  echo "🔐 Cargando variables desencriptadas"
+  set -a
+  source "$PROJECT_ROOT/.env"
+  set +a
 else
-  bash scripts/check_docker_linux.sh
+  echo "❌ No se encontró ni .env ni .env.gpg"
+  exit 1
 fi
 
-# Login a GHCR
+# ✅ Verificar Docker según el sistema operativo
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  bash "$PROJECT_ROOT/scripts/check_docker_macos.sh"
+else
+  bash "$PROJECT_ROOT/scripts/check_docker_linux.sh"
+fi
+
+# 🔑 Login a GHCR
 echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
 
+# 🚀 Actualizar e iniciar contenedores
 echo "🔍 Verificando actualizaciones de imágenes..."
-docker-compose pull
+docker-compose -f "$PROJECT_ROOT/docker-compose.yml" pull
 
 echo "⏬ Apagando contenedores anteriores (si existen)..."
-docker-compose down
+docker-compose -f "$PROJECT_ROOT/docker-compose.yml" down
 
 echo "🚀 Iniciando contenedores..."
-docker-compose up -d
+docker-compose -f "$PROJECT_ROOT/docker-compose.yml" up -d
