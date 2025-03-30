@@ -8,5 +8,9 @@
 *.log
 *.tmp
 
-# Archivos de configuración
+# Ignore auto-generated installers
 /installer_output/
+*.dmg
+*.exe
+*.msi
+*.deb

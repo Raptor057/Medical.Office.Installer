@@ -21,3 +21,6 @@ ls -l $OUTPUT_DIR
 cp build/MedicalOfficeLauncher.command installer_output/MedicalOfficeLauncher.command
 chmod +x installer_output/MedicalOfficeLauncher.command
 
+cp docker-compose.yml installer_output/docker-compose.yml
+cp -r scripts installer_output/scripts
+cp .env installer_output/

@@ -1,4 +1,4 @@
-name: Automatic Generate Installers
+name: Generate Installer Scripts
 
 on:
   push:
@@ -29,11 +29,25 @@ jobs:
       - name: Install CMake
         run: sudo apt-get update && sudo apt-get install -y cmake
 
-      - name: Generate installers
+      - name: Generate installer scripts
         run: bash scripts/generate_installers.sh
 
-      - name: Upload installers
+      - name: Upload installer scripts as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: installers
+          name: installer-scripts
           path: installer_output/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v1.0.${{ github.run_number }}"
+          name: "Medical Office Installer v1.0.${{ github.run_number }}"
+          body: "Scripts generados automáticamente por GitHub Actions"
+          files: |
+            installer_output/start_linux.sh
+            installer_output/start_osx.sh
+            installer_output/start_windows.ps1
+            installer_output/MedicalOfficeLauncher.command
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

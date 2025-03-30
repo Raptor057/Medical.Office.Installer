@@ -1,3 +1,24 @@
 #!/bin/bash
-DIR="$(cd "$(dirname "$0")" && pwd)"
-bash "$DIR/start_osx.sh"
+set -e
+
+# Obtener el path del script (dentro de installer_output)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+export GHCR_USERNAME="@GHCR_USERNAME@"
+export GHCR_PAT="@GHCR_PAT@"
+
+# Verificar Docker
+bash "$SCRIPT_DIR/scripts/check_docker_macos.sh"
+
+# Login a GHCR
+echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+
+# Pull + restart desde docker-compose copiado
+echo "🔍 Verificando actualizaciones de imágenes..."
+docker-compose -f "$SCRIPT_DIR/docker-compose.yml" pull
+
+echo "⏬ Apagando contenedores anteriores (si existen)..."
+docker-compose -f "$SCRIPT_DIR/docker-compose.yml" down
+
+echo "🚀 Iniciando contenedores..."
+docker-compose -f "$SCRIPT_DIR/docker-compose.yml" up -d
