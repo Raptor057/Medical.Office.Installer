@@ -72,10 +72,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install GPG and CMake
+      - name: Install GPG, CMake, and zip
         run: |
           sudo apt-get update
-          sudo apt-get install -y gnupg cmake
+          sudo apt-get install -y gnupg cmake zip
 
       - name: Decrypt .env.gpg
         run: |
@@ -87,11 +87,17 @@ jobs:
         env:
           MY_ENV_PASSPHRASE: ${{ secrets.MY_ENV_PASSPHRASE }}
 
-      - name: Upload installers
+      - name: Zip installer_output
+        run: |
+          cd installer_output
+          zip -r ../medical-office-installer.zip .
+          cd ..
+
+      - name: Upload ZIP installer
         uses: actions/upload-artifact@v4
         with:
-          name: installers
-          path: installer_output/
+          name: medical-office-installer
+          path: medical-office-installer.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -100,10 +106,6 @@ jobs:
           name: "Medical Office Installer v1.0.${{ github.run_number }}"
           body: "Instaladores generados automáticamente desde GitHub Actions"
           files: |
-            installer_output/start_linux.sh
-            installer_output/start_osx.sh
-            installer_output/start_windows.ps1
-            installer_output/.env.gpg
-            installer_output/docker-compose.yml
+            medical-office-installer.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
