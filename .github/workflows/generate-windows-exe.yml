@@ -17,8 +17,8 @@ jobs:
 
       - name: Install GPG
         run: |
-          Invoke-WebRequest -Uri 'https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.4.4_20231214.exe' -OutFile 'gpg-installer.exe'
-          Start-Process -FilePath 'gpg-installer.exe' -ArgumentList '/S' -Wait
+          Invoke-WebRequest -Uri 'https://files.gpg4win.org/gpg4win-4.3.0.exe' -OutFile 'gpg-installer.exe'
+          Start-Process -FilePath 'gpg-installer.exe' -ArgumentList '/SILENT' -Wait
 
       - name: Decrypt .env.gpg
         run: |
