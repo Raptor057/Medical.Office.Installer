@@ -8,7 +8,7 @@ on:
       - '.env'
       - 'scripts/**'
       - 'generate_installers.sh'
-      workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
