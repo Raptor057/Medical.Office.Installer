@@ -16,7 +16,19 @@ endforeach()
 
 message(STATUS "Username: ${GHCR_USERNAME}")
 
-# 🚀 Siempre generar los tres scripts sin importar la plataforma
-configure_file("${PROJECT_SOURCE_DIR}/scripts/start.sh.in" "${CMAKE_BINARY_DIR}/start_linux.sh" @ONLY)
-configure_file("${PROJECT_SOURCE_DIR}/scripts/start.sh.in" "${CMAKE_BINARY_DIR}/start_osx.sh" @ONLY)
-configure_file("${PROJECT_SOURCE_DIR}/scripts/start.ps1.in" "${CMAKE_BINARY_DIR}/start.ps1" @ONLY)
+# # 🚀 Siempre generar los tres scripts sin importar la plataforma
+# configure_file("${PROJECT_SOURCE_DIR}/scripts/start.sh.in" "${CMAKE_BINARY_DIR}/start_linux.sh" @ONLY)
+# configure_file("${PROJECT_SOURCE_DIR}/scripts/start.sh.in" "${CMAKE_BINARY_DIR}/start_osx.sh" @ONLY)
+# configure_file("${PROJECT_SOURCE_DIR}/scripts/start.ps1.in" "${CMAKE_BINARY_DIR}/start.ps1" @ONLY)
+
+# Detectar y procesar todos los archivos .in en scripts/
+file(GLOB SCRIPT_TEMPLATES "${CMAKE_SOURCE_DIR}/scripts/*.in")
+
+foreach(TEMPLATE_FILE ${SCRIPT_TEMPLATES})
+    get_filename_component(FILENAME ${TEMPLATE_FILE} NAME_WE)
+    get_filename_component(EXTENSION ${TEMPLATE_FILE} EXT)
+    
+    if("${EXTENSION}" STREQUAL ".in")
+        configure_file(${TEMPLATE_FILE} ${CMAKE_BINARY_DIR}/${FILENAME} @ONLY)
+    endif()
+endforeach()
