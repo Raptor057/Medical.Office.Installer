@@ -1,5 +1,3 @@
-version: '4.0'
-
 services:
 
   sql1:
@@ -13,6 +11,11 @@ services:
     volumes:
       - medical_office_sql_data:/var/opt/mssql
     restart: always
+    healthcheck:
+      test: ["CMD", "sqlcmd", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   seq:
     image: datalust/seq:latest
@@ -26,7 +29,7 @@ services:
     restart: always
 
   medicalofficeapi:
-    image: ghcr.io/raptor057/medicalofficewebapi:main
+    image: ghcr.io/raptor057/medicalofficewebapi:latest
     container_name: medicalofficewebapi
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
@@ -34,12 +37,14 @@ services:
       - "8080:8080"
       - "8081:8081"
     depends_on:
-      - sql1
-      - seq
+      sql1:
+        condition: service_healthy
+      seq:
+        condition: service_started
     restart: always
 
   frontend:
-    image: ghcr.io/raptor057/medicalofficewebclient:main
+    image: ghcr.io/raptor057/medicalofficewebclient:latest
     container_name: medicalofficewebclient
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
