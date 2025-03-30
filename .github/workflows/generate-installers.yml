@@ -1,4 +1,5 @@
 # .github/workflows/generate-installers.yml
+
 name: Generate Installers
 
 on:
