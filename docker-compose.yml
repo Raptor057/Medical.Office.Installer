@@ -60,15 +60,16 @@
 # volumes:
 #   medical_office_sql_data:
 
-version: '3.9'
+version: '3.8'
+
 services:
 
   sql1:
     container_name: medicalofficesql
-    image: mcr.microsoft.com/mssql/server:latest
+    image: ghcr.io/raptor057/medicalofficesql:latest
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=Cbmwjmkq23
+      - SA_PASSWORD=${SA_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
@@ -90,7 +91,7 @@ services:
     image: ghcr.io/raptor057/medicalofficewebapi:main
     container_name: medicalofficewebapi
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -103,7 +104,7 @@ services:
     image: ghcr.io/raptor057/medicalofficewebclient:main
     container_name: medicalofficewebclient
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - "3000:80"
     depends_on:
