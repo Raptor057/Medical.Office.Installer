@@ -7,7 +7,7 @@ on:
       - 'CMakeLists.txt'
       - '.env'
       - 'scripts/**'
-      - 'generate_installers.sh'
+      - 'scripts/generate_installers.sh'
   workflow_dispatch:
 
 jobs:
@@ -32,21 +32,8 @@ jobs:
       - name: Generate installers
         run: bash scripts/generate_installers.sh
 
-      - name: Upload installers as artifact
+      - name: Upload installers
         uses: actions/upload-artifact@v4
         with:
           name: installers
           path: installer_output/
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v1.0.${{ github.run_number }}"
-          name: "Medical Office Installer v1.0.${{ github.run_number }}"
-          body: "Instaladores generados automáticamente desde GitHub Actions"
-          files: |
-            installer_output/start_linux.sh
-            installer_output/start_osx.sh
-            installer_output/start_windows.ps1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

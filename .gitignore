@@ -7,3 +7,6 @@
 # Archivos temporales
 *.log
 *.tmp
+
+# Archivos de configuración
+/installer_output/
