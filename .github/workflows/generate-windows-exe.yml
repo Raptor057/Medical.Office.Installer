@@ -1,0 +1,89 @@
+name: Generate Windows Installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Crear archivo wrapper.ps1
+        shell: pwsh
+        run: |
+          $wrapperContent = @"
+`$ErrorActionPreference = 'Stop'
+
+`$passphrase = `$env:MY_ENV_PASSPHRASE
+if (-not `$passphrase) {
+    Write-Error 'La passphrase no está definida en la variable de entorno.'
+    exit 1
+}
+
+`$gpgPath = 'C:\Program Files (x86)\GnuPG\bin\gpg.exe'
+if (-not (Test-Path `$gpgPath)) {
+    Write-Output 'Instalando GPG...'
+    Invoke-WebRequest -Uri 'https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.4.4_20231214.exe' -OutFile 'gpg-installer.exe'
+    if (-not (Test-Path 'gpg-installer.exe')) {
+        Write-Error 'Error al descargar el instalador de GPG.'
+        exit 1
+    }
+    Start-Process -FilePath '.\gpg-installer.exe' -ArgumentList '/S' -Wait
+}
+
+if (-not (Test-Path `$gpgPath)) {
+    Write-Error 'GPG no se instaló correctamente.'
+    exit 1
+}
+
+if (-not (Test-Path '.env.gpg')) {
+    Write-Error 'El archivo .env.gpg no existe en el repositorio.'
+    exit 1
+}
+
+& "`$gpgPath" --batch --yes --passphrase "`$passphrase" --output .env --decrypt .env.gpg
+powershell -ExecutionPolicy Bypass -File "start_windows.ps1"
+"@
+          $wrapperContent | Out-File -FilePath wrapper.ps1 -Encoding UTF8
+
+      - name: Install Inno Setup
+        run: |
+          Invoke-WebRequest -Uri 'https://jrsoftware.org/download.php/is.exe' -OutFile 'is.exe'
+          if (-not (Test-Path 'is.exe')) {
+              Write-Error 'Error al descargar el instalador de Inno Setup.'
+              exit 1
+          }
+          Start-Process -FilePath '.\is.exe' -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-" -Wait
+
+      - name: Compilar instalador con Inno Setup
+        run: |
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+              Write-Error 'Inno Setup no está instalado correctamente.'
+              exit 1
+          }
+          if (-not (Test-Path "scripts/windows/create_installer.iss")) {
+              Write-Error 'El archivo create_installer.iss no existe en el repositorio.'
+              exit 1
+          }
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" scripts/windows/create_installer.iss
+        env:
+          MY_ENV_PASSPHRASE: ${{ secrets.MY_ENV_PASSPHRASE }}
+
+      - name: Subir artefacto del instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsInstaller
+          path: installer_output/MedicalOfficeInstaller.exe
+
+      - name: Crear GitHub Release con el .exe
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v1.0.${{ github.run_number }}"
+          name: "Medical Office Windows Installer v1.0.${{ github.run_number }}"
+          body: "Instalador .exe para Windows con configuración automática"
+          files: installer_output/MedicalOfficeInstaller.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
