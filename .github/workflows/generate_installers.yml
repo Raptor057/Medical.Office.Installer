@@ -1,6 +1,6 @@
 # .github/workflows/generate-installers.yml
 
-name: Generate Installers
+name: Automatic Generate Installers
 
 on:
   push:
