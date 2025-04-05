@@ -24,52 +24,53 @@ jobs:
       - name: Verificar si ya existen entradas
         id: check_existing
         run: |
-          touch Version_History.md
+          mkdir -p .github/metadata
+          touch .github/metadata/Version_History.md
 
-          grep -q "v${{ env.WIN }}" Version_History.md || echo "ADD_WIN=true" >> $GITHUB_ENV
-          grep -q "v${{ env.MAC }}" Version_History.md || echo "ADD_MAC=true" >> $GITHUB_ENV
-          grep -q "v${{ env.LINUX }}" Version_History.md || echo "ADD_LINUX=true" >> $GITHUB_ENV
+          grep -q "v${{ env.WIN }}" .github/metadata/Version_History.md || echo "ADD_WIN=true" >> $GITHUB_ENV
+          grep -q "v${{ env.MAC }}" .github/metadata/Version_History.md || echo "ADD_MAC=true" >> $GITHUB_ENV
+          grep -q "v${{ env.LINUX }}" .github/metadata/Version_History.md || echo "ADD_LINUX=true" >> $GITHUB_ENV
 
       - name: Generar nuevas entradas (si aplica)
         run: |
-          cp Version_History.md old.md
-          echo "# 📜 Historial de versiones" > Version_History.md
-          echo "" >> Version_History.md
+          cp .github/metadata/Version_History.md old.md
+          echo "# 📜 Historial de versiones" > .github/metadata/Version_History.md
+          echo "" >> .github/metadata/Version_History.md
 
           if [ "$ADD_WIN" == "true" ]; then
-            echo "## 🪟 Windows" >> Version_History.md
-            echo "### v$WIN - $DATE" >> Version_History.md
-            echo "- 🚀 Versión publicada automáticamente para Windows." >> Version_History.md
-            echo "" >> Version_History.md
-            echo "---" >> Version_History.md
-            echo "" >> Version_History.md
+            echo "## 🪟 Windows" >> .github/metadata/Version_History.md
+            echo "### v$WIN - $DATE" >> .github/metadata/Version_History.md
+            echo "- 🚀 Versión publicada automáticamente para Windows." >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
+            echo "---" >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
           fi
 
           if [ "$ADD_MAC" == "true" ]; then
-            echo "## 🍎 Mac" >> Version_History.md
-            echo "### v$MAC - $DATE" >> Version_History.md
-            echo "- 🚀 Versión publicada automáticamente para Mac." >> Version_History.md
-            echo "" >> Version_History.md
-            echo "---" >> Version_History.md
-            echo "" >> Version_History.md
+            echo "## 🍎 Mac" >> .github/metadata/Version_History.md
+            echo "### v$MAC - $DATE" >> .github/metadata/Version_History.md
+            echo "- 🚀 Versión publicada automáticamente para Mac." >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
+            echo "---" >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
           fi
 
           if [ "$ADD_LINUX" == "true" ]; then
-            echo "## 🐧 Linux" >> Version_History.md
-            echo "### v$LINUX - $DATE" >> Version_History.md
-            echo "- 🚀 Versión publicada automáticamente para Linux." >> Version_History.md
-            echo "" >> Version_History.md
-            echo "---" >> Version_History.md
-            echo "" >> Version_History.md
+            echo "## 🐧 Linux" >> .github/metadata/Version_History.md
+            echo "### v$LINUX - $DATE" >> .github/metadata/Version_History.md
+            echo "- 🚀 Versión publicada automáticamente para Linux." >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
+            echo "---" >> .github/metadata/Version_History.md
+            echo "" >> .github/metadata/Version_History.md
           fi
 
-          cat old.md >> Version_History.md
+          cat old.md >> .github/metadata/Version_History.md
           rm old.md
 
       - name: Commit and push si hubo cambios
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add Version_History.md
+          git add .github/metadata/Version_History.md
           git diff --cached --quiet || git commit -m "docs: actualización de historial de versiones"
           git push
