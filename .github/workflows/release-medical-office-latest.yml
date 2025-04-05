@@ -1,0 +1,41 @@
+name: release-medical-office-zip
+
+on:
+    workflow_dispatch:
+    push:
+        paths:
+        - 'Files/**'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Set up zip environment
+        run: sudo apt-get install -y zip
+
+      - name: 📦 Create ZIP from Files/
+        run: |
+          zip -r Medical-Office.zip Files
+
+      - name: 🔐 Generate SHA256 checksum
+        run: |
+          sha256sum Medical-Office.zip > Medical-Office.zip.sha256
+
+      - name: 🚀 Create GitHub Release (latest)
+        uses: softprops/action-gh-release@v2
+        with:
+          name: latest
+          tag_name: latest
+          files: |
+            Medical-Office.zip
+            Medical-Office.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧹 Cleanup previous release assets (optional)
+        if: always()
+        continue-on-error: true
+        run: echo "Cleanup handled by GitHub API via tag overwrite"
