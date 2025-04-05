@@ -36,5 +36,3 @@ if (Test-Path $gpgInstallerPath) {
     Remove-Item $gpgInstallerPath -Force
     Write-Host "🧹 Instalador eliminado."
 }
-
-
