@@ -1,5 +1,5 @@
 # Entorno
-.env
+.env.secure
 
 # CMake
 /build/
