@@ -48,3 +48,12 @@ Write-Host "`n🧹 Limpiando archivo temporal..."
 Remove-Item $tempEnv -Force
 
 Write-Host "`n✅ Actualización completada con éxito."
+
+
+# Write-Host "🧨 Deteniendo contenedores..."
+# $output = docker compose down 2>&1
+# if ($LASTEXITCODE -ne 0) {
+#     Write-Error "❌ Algo salió mal:\n$output"
+#     exit 1
+# }
+# Write-Host "✅ Contenedores detenidos."
