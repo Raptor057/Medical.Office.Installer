@@ -14,25 +14,48 @@ jobs:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🛠 Instalar módulo ps2exe para convertir a .exe
+      - name: 🛠 Instalar módulo ps2exe para convertir .ps1 a .exe
         shell: pwsh
         run: |
-          Install-Module -Name ps2exe -Scope CurrentUser -Force
+          Install-Module -Name ps2exe -Scope CurrentUser -Force -AllowClobber
 
       - name: ⚙️ Crear EXE desde start.ps1
         shell: pwsh
         run: |
-          $ps1 = ".\raptor057-medical.office.installer\Files\start.ps1"
-          $exe = ".\MedicalOfficeInstaller.exe"
-          $icon = ".\raptor057-medical.office.installer\Installers\Windows\icon.ico"
+          $root = "$PWD"
+          $ps1 = Join-Path $root "raptor057-medical.office.installer\Files\start.ps1"
+          $exe = Join-Path $root "MedicalOfficeInstaller.exe"
+          $icon = Join-Path $root "raptor057-medical.office.installer\Installers\Windows\icon.ico"
+
+          if (!(Test-Path $ps1)) {
+            throw "❌ No se encontró start.ps1 en: $ps1"
+          }
+
+          if (!(Test-Path $icon)) {
+            throw "❌ No se encontró el icono en: $icon"
+          }
+
+          Write-Host "✅ Compilando $ps1 en $exe con ícono $icon"
           Invoke-ps2exe $ps1 $exe -iconFile $icon -noConsole
 
       - name: 📦 Crear ZIP con carpeta Files/ + el .exe
+        shell: pwsh
         run: |
-          mkdir package
-          xcopy raptor057-medical.office.installer\Files package\Files /E /I /Y
-          copy MedicalOfficeInstaller.exe package\
-          Compress-Archive -Path package\* -DestinationPath Medical-Office.zip
+          $root = "$PWD"
+          $package = Join-Path $root "package"
+          $sourceFolder = Join-Path $root "raptor057-medical.office.installer\Files"
+          $destFolder = Join-Path $package "Files"
+
+          New-Item -Path $package -ItemType Directory -Force | Out-Null
+
+          Write-Host "📁 Copiando carpeta Files a package/Files"
+          Copy-Item -Path $sourceFolder -Destination $destFolder -Recurse -Force
+
+          Write-Host "📁 Copiando EXE"
+          Copy-Item -Path "$root\MedicalOfficeInstaller.exe" -Destination "$package" -Force
+
+          $zipPath = Join-Path $root "Medical-Office.zip"
+          Compress-Archive -Path "$package\*" -DestinationPath $zipPath
 
       - name: 🚀 Crear Release en GitHub
         uses: softprops/action-gh-release@v2
@@ -40,7 +63,7 @@ jobs:
           name: Windows Installer
           tag_name: latest-windows
           files: |
-            Medical-Office.zip
             MedicalOfficeInstaller.exe
+            Medical-Office.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
