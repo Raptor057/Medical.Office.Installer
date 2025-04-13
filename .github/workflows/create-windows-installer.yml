@@ -1,0 +1,46 @@
+name: Build Windows Installer
+
+on:
+    workflow_dispatch:
+    push:
+      paths:
+        - version.windows
+
+jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+
+    steps:
+      - name: 🧾 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🛠 Instalar módulo ps2exe para convertir a .exe
+        shell: pwsh
+        run: |
+          Install-Module -Name ps2exe -Scope CurrentUser -Force
+
+      - name: ⚙️ Crear EXE desde start.ps1
+        shell: pwsh
+        run: |
+          $ps1 = ".\raptor057-medical.office.installer\Files\start.ps1"
+          $exe = ".\MedicalOfficeInstaller.exe"
+          $icon = ".\raptor057-medical.office.installer\Installers\Windows\icon.ico"
+          Invoke-ps2exe $ps1 $exe -iconFile $icon -noConsole
+
+      - name: 📦 Crear ZIP con carpeta Files/ + el .exe
+        run: |
+          mkdir package
+          xcopy raptor057-medical.office.installer\Files package\Files /E /I /Y
+          copy MedicalOfficeInstaller.exe package\
+          Compress-Archive -Path package\* -DestinationPath Medical-Office.zip
+
+      - name: 🚀 Crear Release en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Windows Installer
+          tag_name: latest-windows
+          files: |
+            Medical-Office.zip
+            MedicalOfficeInstaller.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
