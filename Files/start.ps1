@@ -1,49 +1,20 @@
-# 🚀 Script: start.ps1 - Lanzador de entorno Docker para Medical Office
+# Hacer que el script falle si ocurre un error
+$ErrorActionPreference = "Stop"
 
-# Preferencia: mostrar errores pero continuar ejecución
-$ErrorActionPreference = "Continue"
+#echo "✅ Usando variables de entorno desde .env.secure"
+#Copy-Item ".env.secure" -Destination ".env"
 
-Write-Host "==============================="
-Write-Host "🩺 Medical Office Installer"
-Write-Host "==============================="
-Write-Host ""
+Write-Host "🚀 Buscando actualización de imágenes (Docker Compose Pull)" -ForegroundColor Cyan
+docker compose pull
 
-# Función para ejecutar un paso con manejo de errores
-function Ejecutar {
-    param (
-        [string]$Mensaje,
-        [ScriptBlock]$Accion
-    )
-    Write-Host "🔸 $Mensaje"
-    try {
-        & $Accion
-    } catch {
-        Write-Host "❌ Error: $_"
-    }
-    Write-Host ""
-}
+Write-Host "🚀 Construyendo servicios (Docker Compose Build)" -ForegroundColor Cyan
+docker compose build
 
-# 1. Pull de imágenes Docker
-Ejecutar "Descargando imágenes con Docker Compose Pull" {
-    docker compose pull
-}
+Write-Host "🚀 Limpiando contenedores y volúmenes (Docker Compose Down)" -ForegroundColor Yellow
+docker compose down
 
-# 2. Build de servicios Docker
-Ejecutar "Construyendo servicios con Docker Compose Build" {
-    docker compose build
-}
+Write-Host "🚀 Levantando servicios con Docker Compose (Up -d)" -ForegroundColor Green
+docker compose up -d
 
-# 3. Down (limpia contenedores antiguos)
-Ejecutar "Eliminando contenedores y volúmenes anteriores" {
-    docker compose down
-}
-
-# 4. Up (levanta los servicios)
-Ejecutar "Levantando servicios con Docker Compose Up -d" {
-    docker compose up -d
-}
-
-Write-Host ""
-Write-Host "✅ Todos los pasos completados (o tolerados)."
-Write-Host "Puedes verificar tus contenedores con:"
-Write-Host "`tdocker ps -a`"
+#Write-Host "🧹 Limpiando archivo temporal .env" -ForegroundColor DarkGray
+#Remove-Item ".env" -Force
