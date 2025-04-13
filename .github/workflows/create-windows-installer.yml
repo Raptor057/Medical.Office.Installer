@@ -23,9 +23,9 @@ jobs:
         shell: pwsh
         run: |
           $root = "$PWD"
-          $ps1 = Join-Path $root "raptor057-medical.office.installer\Files\start.ps1"
+          $ps1 = Join-Path $root "Files\start.ps1"
           $exe = Join-Path $root "MedicalOfficeInstaller.exe"
-          $icon = Join-Path $root "raptor057-medical.office.installer\Installers\Windows\icon.ico"
+          $icon = Join-Path $root "Installers\Windows\icon.ico"
 
           if (!(Test-Path $ps1)) {
             throw "❌ No se encontró start.ps1 en: $ps1"
@@ -43,7 +43,7 @@ jobs:
         run: |
           $root = "$PWD"
           $package = Join-Path $root "package"
-          $sourceFolder = Join-Path $root "raptor057-medical.office.installer\Files"
+          $sourceFolder = Join-Path $root "Files"
           $destFolder = Join-Path $package "Files"
 
           New-Item -Path $package -ItemType Directory -Force | Out-Null
