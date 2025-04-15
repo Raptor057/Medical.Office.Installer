@@ -73,6 +73,16 @@ services:
       - prometheus
     restart: always
 
+  watchtower:
+    image: ${GHCR_IMAGE_WATCHTOWER}
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_NOTIFICATION_EMAIL_TO=${EMAIL_TO}
+      # Las demás variables ya vienen inyectadas desde la imagen
+
 volumes:
   medical_office_sql_data:
   grafana-storage:
