@@ -46,3 +46,11 @@ sections:
         description: Base de datos
         icon: "mdi-database"
         url: "http://localhost:3002"
+
+  - name: "Business Intelligence"
+    icon: "mdi-chart-areaspline"
+    items:
+      - title: Metabase
+        description: Dashboard de datos y BI
+        icon: "mdi-database-eye"
+        url: "http://localhost:3003"
