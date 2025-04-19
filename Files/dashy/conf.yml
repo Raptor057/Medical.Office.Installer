@@ -4,8 +4,8 @@ appConfig:
   statusCheck: true
 
 pageInfo:
-  title: "Dashboard de Raptor"
-  description: "Mis servicios Docker"
+  title: "Dashboard de Medical Office"
+  description: "Panel de control de la oficina médica"
   navLinks:
     - title: GitHub del desarollador
       path: https://github.com/Raptor057
