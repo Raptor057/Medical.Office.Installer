@@ -132,18 +132,12 @@ services:
     container_name: metabase
     ports:
       - "3003:3000"
-    environment:
-      - MB_DB_TYPE=postgres
-      - MB_DB_DBNAME=Medical.Office.SqlLocalDB
-      - MB_DB_PORT=1433
-      - MB_DB_USER=sa
-      - MB_DB_PASS=${SA_PASSWORD}
-      - MB_DB_HOST=sql1
     depends_on:
       - sql1
     restart: always
     volumes:
       - metabase-data:/metabase-data
+
 
 
 
