@@ -138,6 +138,18 @@ services:
     volumes:
       - metabase-data:/metabase-data
 
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"     # HTTP
+      - "81:81"     # Panel de administración web
+      - "443:443"   # HTTPS
+    volumes:
+      - nginx_data:/data
+      - nginx_letsencrypt:/etc/letsencrypt
+
 
 
 
@@ -147,3 +159,5 @@ volumes:
   sqlpad-data:
   sql_backups:
   metabase-data:
+  nginx_data:
+  nginx_letsencrypt:
