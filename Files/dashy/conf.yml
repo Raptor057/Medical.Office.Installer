@@ -1,0 +1,48 @@
+appConfig:
+  theme: colorful
+  layout: auto
+  statusCheck: true
+
+pageInfo:
+  title: "Dashboard de Raptor"
+  description: "Mis servicios Docker"
+  navLinks:
+    - title: GitHub del desarollador
+      path: https://github.com/Raptor057
+
+sections:
+  - name: "Medical Office Panel Control"
+    icon: "mdi-application-cog"
+    items:
+      - title: UI Frontend
+        description: Interfaz de usuario
+        icon: "mdi-monitor"
+        url: "http://localhost:3000"
+      - title: Web API
+        description: Backend principal
+        icon: "mdi-api"
+        url: "http://localhost:8080"
+      - title: Métricas API
+        description: Prometheus metrics
+        icon: "mdi-chart-line"
+        url: "http://localhost:8080/metrics"
+      - title: Health Checks
+        description: Monitor de estado
+        icon: "mdi-heart-pulse"
+        url: "http://localhost:8080/monitor#/healthchecks"
+      - title: Grafana
+        description: Panel de visualización
+        icon: "mdi-chart-bar"
+        url: "http://localhost:3001"
+      - title: Prometheus
+        description: Monitor de métricas
+        icon: "mdi-poll"
+        url: "http://localhost:9090/targets"
+      - title: SEQ Logs
+        description: Visualizador de logs
+        icon: "mdi-file-document-outline"
+        url: "http://localhost:5341/"
+      - title: SQL Server
+        description: Base de datos
+        icon: "mdi-database"
+        url: "http://localhost:3002"

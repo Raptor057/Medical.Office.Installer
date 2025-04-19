@@ -1,5 +1,4 @@
 services:
-
   sql1:
     container_name: medicalofficesql
     image: ${GHCR_IMAGE_SQL}
@@ -81,8 +80,42 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WATCHTOWER_NOTIFICATION_EMAIL_TO=${EMAIL_TO}
-      # Las demás variables ya vienen inyectadas desde la imagen
+
+  sqlpad:
+    image: sqlpad/sqlpad:latest
+    container_name: sqlpad
+    restart: always
+    ports:
+      - "3002:3000"
+    environment:
+      - SQLPAD_ADMIN=admin
+      - SQLPAD_ADMIN_PASSWORD=admin
+      - SQLPAD_AUTH_DISABLED=false
+      - SQLPAD_APP_LOG_LEVEL=debug
+      - SQLPAD_WEB_LOG_LEVEL=debug
+      - SQLPAD_CONNECTIONS__sqlserver__name=MedicalOfficeDB
+      - SQLPAD_CONNECTIONS__sqlserver__driver=sqlserver
+      - SQLPAD_CONNECTIONS__sqlserver__host=sql1
+      - SQLPAD_CONNECTIONS__sqlserver__port=1433
+      - SQLPAD_CONNECTIONS__sqlserver__database=Medical.Office.SqlLocalDB
+      - SQLPAD_CONNECTIONS__sqlserver__username=sa
+      - SQLPAD_CONNECTIONS__sqlserver__password=${SA_PASSWORD}
+    volumes:
+      - sqlpad-data:/var/lib/sqlpad
+    depends_on:
+      - sql1
+
+
+  dashy:
+    image: lissy93/dashy
+    container_name: dashy
+    ports:
+      - "4000:8080"
+    volumes:
+      - ./dashy/conf.yml:/app/user-data/conf.yml
+    restart: unless-stopped
 
 volumes:
   medical_office_sql_data:
   grafana-storage:
+  sqlpad-data:
