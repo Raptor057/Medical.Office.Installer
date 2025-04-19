@@ -133,7 +133,7 @@ services:
     ports:
       - "3003:3000"
     environment:
-      - MB_DB_TYPE=sqlserver
+      - MB_DB_TYPE=postgres
       - MB_DB_DBNAME=Medical.Office.SqlLocalDB
       - MB_DB_PORT=1433
       - MB_DB_USER=sa
