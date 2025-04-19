@@ -54,3 +54,11 @@ sections:
         description: Dashboard de datos y BI
         icon: "mdi-database-eye"
         url: "http://localhost:3003"
+
+  - name: "Docker Utilities"
+    icon: "mdi-view-dashboard"
+    items:
+      - title: Portainer
+        description: Administra tus contenedores
+        icon: "mdi-docker"
+        url: "http://localhost:9000"
