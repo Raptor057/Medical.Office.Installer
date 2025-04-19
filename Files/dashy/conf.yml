@@ -62,3 +62,8 @@ sections:
         description: Administra tus contenedores
         icon: "mdi-docker"
         url: "http://localhost:9000"
+      - title: NGINX Proxy Manager
+        description: Administra tus proxies y certificados
+        icon: "mdi-server-network"
+        url: "http://localhost:8088"
+
