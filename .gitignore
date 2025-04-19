@@ -15,3 +15,6 @@
 *.exe
 *.msi
 *.deb
+Files/docker-dev.sh
+Files/docker-compose-dev.yml
+Files/docker-cleanup.sh
